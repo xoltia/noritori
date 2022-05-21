@@ -1,6 +1,6 @@
 import User, {UserValidationSchema} from '../models/user';
 import {Request, Response} from 'express';
-import {Controller, Get, Post} from './decorators';
+import {Controller, Post} from './decorators';
 import {ValidateBody} from '../middleware/validation';
 
 @Controller('/auth')
