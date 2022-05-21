@@ -7,10 +7,7 @@ import config from '../config';
 export interface IUser {
   name: string;
   password: string;
-  comparePassword(
-    candidatePassword: string,
-    cb: (err: Error | undefined, isMatch: boolean) => void
-  ): void;
+  comparePassword(candidatePassword: string): Promise<boolean>;
   getToken(): string;
 }
 
@@ -23,7 +20,6 @@ const UserSchema = new Schema<IUser>({
   password: {
     type: String,
     required: true,
-    select: false,
   },
 });
 
@@ -38,11 +34,13 @@ UserSchema.pre('save', function (next) {
 
 UserSchema.method(
   'comparePassword',
-  function (
-    candidatePassword: string,
-    cb: (err: Error | undefined, isMatch: boolean) => void
-  ) {
-    bcrypt.compare(candidatePassword, this.password, cb);
+  function (candidatePassword: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
+        if (err) return reject(err);
+        resolve(isMatch);
+      });
+    });
   }
 );
 

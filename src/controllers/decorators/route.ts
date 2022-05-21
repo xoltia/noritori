@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import {Handler} from 'express';
 
 enum RequestMethod {
   GET = 'get',
@@ -12,6 +13,7 @@ export interface RouteDefinition {
   path: string;
   requestMethod: RequestMethod;
   methodName: string;
+  middleware: Handler[];
 }
 
 export const Get = (path: string): MethodDecorator =>
@@ -33,7 +35,7 @@ function createRouteMethodDecorator(
   path: string,
   requestMethod: RequestMethod
 ): MethodDecorator {
-  return (target, propertyKey): void => {
+  return (target, propertyKey) => {
     if (!Reflect.hasMetadata('routes', target.constructor)) {
       Reflect.defineMetadata('routes', [], target.constructor);
     }
@@ -43,12 +45,18 @@ function createRouteMethodDecorator(
       target.constructor
     ) as RouteDefinition[];
 
+    const middlewares =
+      Reflect.getMetadata('middlewares', target.constructor) || {};
+
     routes.push({
       requestMethod,
       path,
       methodName: propertyKey.toString(),
+      middleware: middlewares[propertyKey.toString()] || [],
     });
 
     Reflect.defineMetadata('routes', routes, target.constructor);
+
+    return target;
   };
 }

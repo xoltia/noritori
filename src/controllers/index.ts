@@ -29,28 +29,35 @@ export async function createRouter(): Promise<Router> {
 
   // register all the controllers
   controllers.forEach(controller => {
-    const basePath = Reflect.getMetadata('basePath', controller);
+    const basePath: string = Reflect.getMetadata('basePath', controller);
     const routes: RouteDefinition[] = Reflect.getMetadata('routes', controller);
     const router = Router();
     const instance = new controller();
 
     // register all the routes
     routes.forEach(route => {
-      const {requestMethod, path, methodName} = route;
+      const {requestMethod, path, methodName, middleware} = route;
       const method = instance[methodName];
 
       console.log(
         format(
-          '[%s] Registering route: %s %s%s',
+          `[%s] Registering route: %s %s %s%s\n${' '.repeat(
+            instance.constructor.name.length + 3
+          )}(%s)`,
           instance.constructor.name,
+          methodName,
           requestMethod.toUpperCase(),
           basePath,
-          path
+          path,
+          middleware.map(f => (f.name || 'arrow function') + ' -> ').join() +
+            instance.constructor.name +
+            '.' +
+            methodName
         )
       );
 
       // transpiled methods are never async, so no need to wrap with express-async-handler
-      router[requestMethod](path, method);
+      router[requestMethod](path, middleware, method);
     });
 
     mainRouter.use(basePath, router);
