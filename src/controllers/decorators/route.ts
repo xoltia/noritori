@@ -7,6 +7,7 @@ enum RequestMethod {
   DELETE = 'delete',
   OPTIONS = 'options',
   PUT = 'put',
+  PATCH = 'patch',
 }
 
 export interface RouteDefinition {
@@ -24,6 +25,9 @@ export const Post = (path: string): MethodDecorator =>
 
 export const Delete = (path: string): MethodDecorator =>
   createRouteMethodDecorator(path, RequestMethod.DELETE);
+
+export const Patch = (path: string): MethodDecorator =>
+  createRouteMethodDecorator(path, RequestMethod.PATCH);
 
 export const Put = (path: string): MethodDecorator =>
   createRouteMethodDecorator(path, RequestMethod.PUT);

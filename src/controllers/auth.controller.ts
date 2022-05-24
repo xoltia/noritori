@@ -9,7 +9,7 @@ export default class AuthController {
   @ValidateBody(UserValidationSchema)
   async login(req: Request, res: Response) {
     const {name, password} = req.body;
-    const user = await User.findOne({name});
+    const user = await User.findOne({name}).select('+password');
     const isMatch = user && (await user.comparePassword(password));
     if (isMatch) {
       const token = user.getToken();
@@ -26,7 +26,7 @@ export default class AuthController {
   @ValidateBody(UserValidationSchema)
   async register(req: Request, res: Response) {
     const {name, password} = req.body;
-    const user = await User.findOne({name});
+    const user = await User.findOne({name}).select('+password');
     if (user) {
       res.status(403).json({
         error: 'User already exists',

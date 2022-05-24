@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import config from '../config';
 
 export interface IUser {
+  _id: Schema.Types.ObjectId;
   name: string;
   password: string;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -20,6 +21,7 @@ const UserSchema = new Schema<IUser>({
   password: {
     type: String,
     required: true,
+    select: false,
   },
 });
 
@@ -48,9 +50,9 @@ UserSchema.method('getToken', function () {
   return jwt.sign({sub: this.id}, config.secret);
 });
 
-export default model<IUser>('User', UserSchema);
-
 export const UserValidationSchema = Joi.object().keys({
   name: Joi.string().min(3).max(30).required(),
   password: Joi.string().min(8).max(50).required(),
 });
+
+export default model<IUser>('User', UserSchema);

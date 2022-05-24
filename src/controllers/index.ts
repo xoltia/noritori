@@ -49,7 +49,7 @@ export async function createRouter(): Promise<Router> {
           requestMethod.toUpperCase(),
           basePath,
           path,
-          middleware.map(f => (f.name || 'arrow function') + ' -> ').join() +
+          middleware.map(f => (f.name || 'arrow function') + ' -> ').join('') +
             instance.constructor.name +
             '.' +
             methodName

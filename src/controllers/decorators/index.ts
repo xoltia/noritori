@@ -1,4 +1,4 @@
 import Controller from './controller';
-import {Get, Post, Delete, Put, Options} from './route';
+import {Get, Post, Delete, Patch, Put, Options} from './route';
 
-export {Controller, Get, Post, Delete, Put, Options};
+export {Controller, Get, Post, Delete, Patch, Put, Options};

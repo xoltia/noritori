@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import {promisify} from 'util';
-import joi from 'joi';
+import Joi from 'joi';
 
 const readFile = promisify(fs.readFile);
 
@@ -14,11 +14,11 @@ export interface Config {
 }
 
 // This will be used to validate the config file
-const configSchema = joi.object().keys({
-  port: joi.number().default(3000),
-  mongoUri: joi.string().default('mongodb://localhost:27017/noritori'),
-  secret: joi.string().required(),
-  isProduction: joi.boolean().default(process.env.NODE_ENV === 'production'),
+const configSchema = Joi.object().keys({
+  port: Joi.number().default(3000),
+  mongoUri: Joi.string().default('mongodb://localhost:27017/noritori'),
+  secret: Joi.string().required(),
+  isProduction: Joi.boolean().default(process.env.NODE_ENV === 'production'),
 });
 
 // Empty config object and variable to check if already loaded
