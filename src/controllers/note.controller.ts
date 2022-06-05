@@ -59,7 +59,7 @@ export default class NoteController {
       return res.status(403).send({
         message: 'You are not the creator of this note',
       });
-    if (!note.reviewable)
+    if (!note.isReviewable)
       return res.status(400).send({
         message: 'Note is not reviewable',
       });

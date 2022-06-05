@@ -11,7 +11,8 @@
     "fix": "gts fix",
     "prepare": "npm.cmd run compile",
     "pretest": "npm.cmd run compile",
-    "posttest": "npm.cmd run lint"
+    "posttest": "npm.cmd run lint",
+    "start": "tsc && node build/app.js"
   },
   "author": "",
   "license": "ISC",

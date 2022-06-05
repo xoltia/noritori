@@ -40,12 +40,12 @@ export enum NoteType {
 
 export interface INote {
   _id: Schema.Types.ObjectId;
-  creator: IUser;
+  creator: Schema.Types.ObjectId | IUser;
   text: string;
   meanings: string[];
   readings: string[];
   description?: string;
-  exampleSentence: string[];
+  exampleSentences: string[];
   notes?: string;
   tags: string[];
   type: NoteType;
@@ -54,7 +54,7 @@ export interface INote {
   burnedAt?: Date;
   createdAt: Date;
 
-  get reviewable(): boolean;
+  get isReviewable(): boolean;
   get isBurned(): boolean;
 
   computeDueDate(): Date;
@@ -87,7 +87,7 @@ export const NoteInsertSchema = Joi.object({
   meanings: Joi.array().items(Joi.string()).min(1).max(30).required(),
   readings: Joi.array().items(Joi.string()).min(1).max(30).required(),
   description: Joi.string(),
-  exampleSentence: Joi.array().items(Joi.string()),
+  exampleSentences: Joi.array().items(Joi.string()),
   notes: Joi.string(),
   tags: Joi.array().items(Joi.string()),
   type: Joi.string().valid(NoteType.Word, NoteType.Kanji),
@@ -115,7 +115,7 @@ const NoteSchema = new Schema<INote>(
     description: {
       type: String,
     },
-    exampleSentence: {
+    exampleSentences: {
       type: [String],
       default: [],
     },
@@ -156,7 +156,7 @@ NoteSchema.virtual('isBurned').get(function () {
   return this.level >= LEVEL_TIMINGS.length;
 });
 
-NoteSchema.virtual('reviewable').get(function () {
+NoteSchema.virtual('isReviewable').get(function () {
   return !this.isBurned && this.dueAt && this.dueAt < new Date();
 });
 
@@ -171,7 +171,7 @@ NoteSchema.method('computeDueDate', function (): Date {
 });
 
 NoteSchema.method('levelUp', function () {
-  if (!this.reviewable) {
+  if (!this.isReviewable) {
     throw new Error('Note is not reviewable');
   }
 
@@ -186,7 +186,7 @@ NoteSchema.method('levelUp', function () {
 });
 
 NoteSchema.method('levelDown', function (numTimesIncorrect: number) {
-  if (!this.reviewable) {
+  if (!this.isReviewable) {
     throw new Error('Note is not reviewable');
   }
 
