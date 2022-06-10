@@ -46,7 +46,6 @@ export interface INote {
   readings: string[];
   description?: string;
   exampleSentences: string[];
-  notes?: string;
   tags: string[];
   type: NoteType;
   level: number;
@@ -88,7 +87,6 @@ export const NoteInsertSchema = Joi.object({
   readings: Joi.array().items(Joi.string()).min(1).max(30).required(),
   description: Joi.string(),
   exampleSentences: Joi.array().items(Joi.string()),
-  notes: Joi.string(),
   tags: Joi.array().items(Joi.string()),
   type: Joi.string().valid(NoteType.Word, NoteType.Kanji),
 });
@@ -118,9 +116,6 @@ const NoteSchema = new Schema<INote>(
     exampleSentences: {
       type: [String],
       default: [],
-    },
-    notes: {
-      type: String,
     },
     tags: {
       type: [String],
@@ -204,16 +199,25 @@ export function getQueryFilter(query: NoteQuery): FilterQuery<INote> {
   const {level, levelGt, levelLt, type, burned, due, dueAt} = query;
   const conditions: FilterQuery<INote> = {};
 
-  if (level) conditions.level = level;
+  const hasLevel = typeof level !== 'undefined';
+  const hasLevelGt = typeof levelGt !== 'undefined';
+  const hasLevelLt = typeof levelLt !== 'undefined';
+  const hasType = typeof type !== 'undefined';
+  const hasBurned = typeof burned !== 'undefined';
+  const hasDue = typeof due !== 'undefined';
+  const hasDueAt = typeof dueAt !== 'undefined';
 
-  if (levelGt && levelLt) conditions.level = {$gte: levelGt, $lte: levelLt};
-  else if (levelGt) conditions.level = {$gte: levelGt};
-  else if (levelLt) conditions.level = {$lte: levelLt};
+  if (hasLevel) conditions.level = level;
 
-  if (type) conditions.type = type;
-  if (burned) conditions.burnedAt = {$exists: true};
-  if (due) conditions.dueAt = {$lte: new Date()};
-  if (dueAt) conditions.dueAt = {$lte: dueAt};
+  if (hasLevelGt && hasLevelLt)
+    conditions.level = {$gte: levelGt, $lte: levelLt};
+  else if (hasLevelGt) conditions.level = {$gte: levelGt};
+  else if (hasLevelLt) conditions.level = {$lte: levelLt};
+
+  if (hasType) conditions.type = type;
+  if (hasBurned) conditions.burnedAt = {$exists: true};
+  if (hasDue) conditions.dueAt = {$lte: new Date()};
+  if (hasDueAt) conditions.dueAt = {$lte: dueAt};
 
   return conditions;
 }
